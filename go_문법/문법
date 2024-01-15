@@ -1,0 +1,108 @@
+// Go 언어의 기본적인 문법에 대해 알아보겠습니다.
+
+// 1. 변수 선언: Go에서 변수는 var 키워드를 사용해 선언합니다. 타입은 변수 이름 뒤에 명시합니다.
+var x int
+x = 10
+
+// 또는 :=를 사용하여 변수 선언과 동시에 초기화를 할 수 있습니다.
+x := 10
+
+// 2. 조건문: Go에서 조건문은 if, else if, else를 사용합니다.
+if x > 10 {
+    fmt.Println("x is greater than 10")
+} else if x == 10 {
+    fmt.Println("x is equal to 10")
+} else {
+    fmt.Println("x is less than 10")
+}
+
+// 3. 반복문: Go에서는 for 문만을 사용해 반복을 처리합니다.
+for i := 0; i < 10; i++ {
+    fmt.Println(i)
+}
+
+// 4. 함수 선언: Go에서 함수는 func 키워드를 사용해 선언합니다.
+func add(x int, y int) int {
+    return x + y
+}
+
+// 5. 에러 처리: Go에서는 예외 처리 대신 에러 처리를 합니다. 일반적으로 함수는 결과와 에러를 반환하며, 에러는 nil이 아닌 경우에만 처리합니다.
+result, err := someFunction()
+if err != nil {
+    // handle error
+}
+
+// 6. 구조체(Structs): Go에서는 클래스 대신 구조체를 사용합니다. 메서드는 func 키워드를 사용하여 구조체에 연결할 수 있습니다.
+type Person struct {
+    Name string
+    Age  int
+}
+
+func (p Person) SayHello() {
+    fmt.Println("Hello, my name is", p.Name)
+}
+
+func main() {
+    var p Person
+    p.Name = "Alice"
+    p.Age = 30
+
+    p.SayHello()
+}
+
+// 7. defer 키워드: defer 키워드는 함수 내에서 특정 문장 또는 함수를 나중에 
+// (즉, 함수가 리턴하기 직전에) 실행하도록 스케줄링합니다. 이는 파일을 닫거나 언락 등의 정리 작업을 수행할 때 유용합니다.
+
+//  *go에서 언더바는 블랭크 식별자이며, 이는 반환된 값을 무시할때 사용함.
+//  *os.Open("file.txt") 함수는 두 개의 값, 
+//  즉 열린 파일의 핸들과 에러를 반환합니다. 
+//  만약 에러 처리를 하지 않고 파일 핸들만 사용하려 할 경우, 블랭크 식별자 _를 사용하여 에러 값을 무시할 수 있습니다.
+file, _ := os.Open("file.txt")
+defer file.Close()
+
+// 다만 실제 코드에서는 에러를 무시하는 것이 권장되지 않음. 보통은 아래와 같이 에러 처리함.
+file, err := os.Open("file.txt")
+if err != nil {
+    // handle error
+}
+defer file.Close()
+
+
+// 8. 채널(Channel): Go는 고루틴(goroutine)과 채널(channel)을 제공하여 
+// 동시성 프로그래밍을 쉽게 할 수 있게 합니다. 채널은 고루틴 간에 데이터를 전달하거나 고루틴의 실행을 동기화하는 데 사용됩니다.
+ch := make(chan int)
+
+go func() {
+    ch <- doSomething()  // Send result to channel
+}()
+
+result := <-ch  // Receive result from channel
+
+// 채널(Channel)은 Go 언어에서 고루틴(Goroutine) 간에 데이터를 주고받을 수 있는 통로라고 생각하시면 됩니다. 
+// 즉, 하나의 고루틴에서 채널에 데이터를 보내면, 다른 고루틴에서 그 채널로부터 데이터를 받을 수 있습니다.
+
+// 이것은 마치 우리가 편지를 보내는 것과 비슷합니다. 
+// 편지를 작성해서 우체통에 넣으면, 우체국에서 그 편지를 가져가서 받는 사람에게 전달합니다. 
+// 채널도 마찬가지로 데이터를 보내는 고루틴이 채널에 데이터를 넣으면, 그 채널에서 데이터를 받는 고루틴이 데이터를 가져갑니다.
+
+// 아래는 채널을 사용하는 간단한 예제입니다:
+package main
+
+import (
+    "fmt"
+    "time"
+)
+
+func sendMessage(ch chan string, message string) {
+    time.Sleep(2 * time.Second)
+    ch <- message // Send a message to the channel
+}
+
+func main() {
+    messages := make(chan string)
+
+    go sendMessage(messages, "Hello, World!")
+
+    msg := <-messages // Receive message from channel
+    fmt.Println(msg)
+}
